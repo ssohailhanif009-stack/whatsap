@@ -18,6 +18,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden;
         }
 
         .chat-container {
@@ -30,6 +31,19 @@
             flex-direction: column;
             overflow: hidden;
             position: relative;
+        }
+
+        /* Mobile Responsive Full Screen Layout */
+        @media screen and (max-width: 768px) {
+            body {
+                background-color: #efeae2;
+            }
+            .chat-container {
+                width: 100% !important;
+                height: 100vh !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+            }
         }
 
         /* Mobile Status Bar */
@@ -185,13 +199,10 @@
             gap: 10px;
             background-image: radial-gradient(#cbd2d6 0.75px, transparent 0.75px);
             background-size: 15px 15px;
-            
-            /* Scrollbar khatam karne ke liye */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* Internet Explorer/Edge */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
 
-        /* Chrome, Safari, Opera ke liye scrollbar hide */
         .chat-messages::-webkit-scrollbar {
             display: none;
         }
@@ -640,7 +651,6 @@
             document.getElementById('emojiPicker').style.display = 'none';
         });
 
-        // Load purane saved messages jab index.html open ho (Yahan msg.type use hoga taake refresh par color change na ho)
         window.addEventListener('DOMContentLoaded', () => {
             const savedMessages = JSON.parse(localStorage.getItem('whatsapp_messages')) || [];
             savedMessages.forEach(msg => {
@@ -648,14 +658,11 @@
             });
         });
 
-        // Sunta hai ke doosri file se koi naya message aya ya nahi
         window.addEventListener('storage', (event) => {
             if (event.key === 'whatsapp_messages') {
                 const messages = JSON.parse(event.newValue);
                 if (messages && messages.length > 0) {
                     const latestMsg = messages[messages.length - 1];
-                    // Agar message doosri file se aya hai to check karein ke wo type kia hai
-                    // Agar wo 'sent' save hua hai doosri file mein, to is file ke liye wo 'received' ban kar save aur render hoga
                     if (latestMsg.type === 'sent') {
                         latestMsg.type = 'received';
                     }
@@ -760,6 +767,28 @@
                 alert("Voice recording simulation: Mic button clicked!");
             }
         }
+
+        // 3 Taps (Mobile) / 3 Clicks (Laptop) to switch to sender.html
+        const chatMessagesArea = document.getElementById('chatMessages');
+        let clickCount = document.body.clientWidth <= 768 ? 0 : 0; // works for both
+        let clickTimer = null;
+
+        chatMessagesArea.addEventListener('click', (e) => {
+            // Agar delete button ya message edit par click ho to navigation trigger na ho
+            if (e.target.closest('button') || e.target.getAttribute('contenteditable') === 'true') return;
+            
+            clickCount++;
+            if (clickTimer) clearTimeout(clickTimer);
+
+            clickTimer = setTimeout(() => {
+                clickCount = 0;
+            }, 500); // 500ms window for 3 clicks/taps
+
+            if (clickCount >= 3) {
+                clickCount = 0;
+                window.location.href = 'sender.html';
+            }
+        });
     </script>
 </body>
 </html>

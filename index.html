@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Chat Interface</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #dadbd4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .chat-container {
+            width: 400px;
+            height: 650px;
+            background-color: #efeae2;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Mobile Status Bar */
+        .status-bar {
+            background-color: #ffffff;
+            color: #4b4b4b;
+            padding: 6px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .status-time {
+            outline: none;
+            cursor: text;
+            font-weight: 600;
+            color: #222;
+        }
+
+        .status-time:focus {
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-icon svg {
+            fill: #4b4b4b;
+        }
+
+        .signal-group {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .battery-container {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-weight: 600;
+            color: #4b4b4b;
+        }
+
+        /* WhatsApp Header */
+        .chat-header {
+            background-color: #ffffff;
+            color: #111;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-arrow {
+            font-size: 20px;
+            color: #111;
+            cursor: pointer;
+            outline: none;
+            font-weight: 600;
+        }
+
+        .profile-pic-container {
+            position: relative;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .profile-pic-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .profile-pic-container span {
+            font-weight: bold;
+            color: #555;
+            font-size: 13px;
+        }
+
+        .profile-info h3 {
+            font-size: 16px;
+            color: #111;
+            font-weight: 500;
+            outline: none;
+            cursor: text;
+        }
+
+        .profile-info h3:focus {
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            cursor: pointer;
+        }
+
+        .header-right span {
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-right svg {
+            width: 22px;
+            height: 22px;
+            fill: none;
+            stroke: #111;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Chat Messages Area */
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-image: radial-gradient(#cbd2d6 0.75px, transparent 0.75px);
+            background-size: 15px 15px;
+            
+            /* Scrollbar khatam karne ke liye */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* Internet Explorer/Edge */
+        }
+
+        /* Chrome, Safari, Opera ke liye scrollbar hide */
+        .chat-messages::-webkit-scrollbar {
+            display: none;
+        }
+
+        .date-badge-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 4px;
+        }
+
+        .date-badge {
+            background-color: #ffffff;
+            color: #54656f;
+            font-size: 11px;
+            padding: 5px 12px;
+            border-radius: 6px;
+            box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.1);
+            outline: none;
+            cursor: text;
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .date-badge:focus {
+            background-color: #f0f2f5;
+        }
+
+        .encryption-box {
+            background-color: #fcf5c7;
+            color: #5f4b00;
+            font-size: 11px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.1);
+            line-height: 1.4;
+            outline: none;
+            cursor: text;
+            margin-bottom: 5px;
+        }
+
+        .encryption-box:focus {
+            background-color: #f9efb1;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 8px 12px;
+            border-radius: 7.5px;
+            font-size: 14px;
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+        }
+
+        .message .delete-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .message:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .message.sent {
+            background-color: #d9fdd3;
+            align-self: flex-end;
+            border-top-right-radius: 0;
+        }
+
+        .message.received {
+            background-color: #ffffff;
+            align-self: flex-start;
+            border-top-left-radius: 0;
+        }
+
+        .message-content {
+            outline: none;
+            display: inline-block;
+            min-width: 20px;
+        }
+
+        .message-content:focus {
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 2px;
+        }
+
+        .message .meta-info {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            float: right;
+            margin-left: 10px;
+            margin-top: 4px;
+        }
+
+        .message .time {
+            font-size: 10px;
+            color: #999;
+            outline: none;
+            cursor: text;
+        }
+
+        .message .time:focus {
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 2px;
+        }
+
+        .ticks {
+            font-size: 11px;
+            color: #53bdeb;
+            font-weight: bold;
+            letter-spacing: -3px;
+        }
+
+        /* Chat Input Area */
+        .chat-input-area {
+            background-color: #efeae2;
+            padding: 8px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-box-wrapper {
+            flex: 1;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            border-radius: 24px;
+            padding: 6px 12px;
+            gap: 12px;
+            box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .input-box-wrapper .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-box-wrapper .icon-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: none;
+            stroke: #54656f;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            background-color: transparent;
+            color: #111;
+        }
+
+        .chat-input-area input::placeholder {
+            color: #8696a0;
+        }
+
+        .send-mic-btn {
+            background-color: #00a884;
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .send-mic-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .send-mic-btn:hover {
+            background-color: #008f6f;
+        }
+
+        .emoji-picker {
+            position: absolute;
+            bottom: 55px;
+            left: 10px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 8px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: none;
+        }
+
+        .emoji-picker span {
+            font-size: 20px;
+            cursor: pointer;
+            text-align: center;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .emoji-picker span:hover {
+            background-color: #f0f2f5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <!-- Mobile Status Bar -->
+        <div class="status-bar">
+            <span class="status-time" contenteditable="true" spellcheck="false">11:31</span>
+            <div class="status-right">
+                <span class="status-icon" title="Alarm">
+                    <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14h-2v-4h2v4zm0-6h-2V7h2v3z"/><path d="M5.5 4.5L7 3m10 1.5L15.5 3"/></svg>
+                </span>
+                <span class="status-icon" title="Wi-Fi">
+                    <svg width="16" height="14" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 .7.08 1.39.23 2.05l1.91-.71A7.002 7.002 0 0 1 12 5a7.002 7.002 0 0 1 6.86 8.34l1.91.71C20.92 13.39 21 12.7 21 12c0-4.97-4.03-9-9-9zm0 6c-1.66 0-3 1.34-3 3 0 .43.1.84.27 1.21l1.59-.59c-.12-.19-.18-.41-.18-.62 0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5c0 .21-.06.43-.18.62l1.59.59c.17-.37.27-.78.27-1.21 0-1.66-1.34-3-3-3zm0 5c-.83 0-1.5.67-1.5 1.5 0 .33.11.64.3.89l1.2-.45 1.2.45c.19-.25.3-.56.3-.89 0-.83-.67-1.5-1.5-1.5z"/><path d="M9 18l-2 2h4zm6 0l2 2h-4z"/></svg>
+                </span>
+                <div class="signal-group">
+                    <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                        <span style="font-size: 7.5px; font-weight: bold; color: #4b4b4b;">Vo)))</span>
+                        <span style="font-size: 7.5px; font-weight: bold; color: #4b4b4b;">LTE1</span>
+                    </div>
+                    <svg width="12" height="12" viewBox="0 0 24 24"><rect x="2" y="16" width="3" height="6" rx="0.5"/><rect x="7" y="12" width="3" height="10" rx="0.5"/><rect x="12" y="8" width="3" height="14" rx="0.5"/><rect x="17" y="3" width="3" height="19" rx="0.5"/></svg>
+                </div>
+                <div class="signal-group" style="margin-left: 2px;">
+                    <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                        <span style="font-size: 7.5px; font-weight: bold; color: #4b4b4b;">Vo)))</span>
+                        <span style="font-size: 7.5px; font-weight: bold; color: #4b4b4b;">LTE2</span>
+                    </div>
+                    <svg width="12" height="12" viewBox="0 0 24 24"><rect x="2" y="16" width="3" height="6" rx="0.5"/><rect x="7" y="12" width="3" height="10" rx="0.5"/><rect x="12" y="8" width="3" height="14" rx="0.5"/><rect x="17" y="3" width="3" height="19" rx="0.5"/></svg>
+                </div>
+                <div class="battery-container" style="margin-left: 4px;">
+                    <span contenteditable="true" spellcheck="false" style="font-size: 11px;">21%</span>
+                    <svg width="18" height="11" viewBox="0 0 24 12"><rect x="1" y="1" width="20" height="10" rx="2" fill="none" stroke="#4b4b4b" stroke-width="2"/><path d="M23 4v4" stroke="#4b4b4b" stroke-width="2" stroke-linecap="round"/><rect x="3" y="3" width="9" height="6" fill="#4b4b4b"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="header-left">
+                <span class="back-arrow" contenteditable="true" spellcheck="false">←</span>
+                <div class="profile-pic-container" onclick="document.getElementById('dpInput').click()" title="Click to change DP">
+                    <span id="dpText">AH</span>
+                    <img id="dpImage" src="" alt="DP">
+                </div>
+                <input type="file" id="dpInput" accept="image/*" style="display: none;" onchange="changeDP(event)">
+                
+                <div class="profile-info">
+                    <h3 contenteditable="true" spellcheck="false">Atif Hanif</h3>
+                </div>
+            </div>
+            <div class="header-right">
+                <span contenteditable="true" spellcheck="false" title="Video Call">
+                    <svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v-4zM3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+                </span>
+                <span contenteditable="true" spellcheck="false" title="Voice Call">
+                    <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                </span>
+                <span contenteditable="true" spellcheck="false" title="More Options">
+                    <svg viewBox="0 0 24 24" style="fill: #111; stroke: none;"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+                </span>
+            </div>
+        </div>
+
+        <!-- Messages Box -->
+        <div class="chat-messages" id="chatMessages">
+            <div class="date-badge-container">
+                <div class="date-badge" contenteditable="true" spellcheck="false">Today</div>
+            </div>
+
+            <div class="encryption-box" contenteditable="true" spellcheck="false">
+                🔒 Messages and calls are end-to-end encrypted. Only people in this chat can read, listen to, or share them. <b>Learn more</b>
+            </div>
+
+            <div class="message sent">
+                <button class="delete-btn" onclick="this.parentElement.remove()" title="Delete message">×</button>
+                <span class="message-content" contenteditable="true" spellcheck="false">Atif sham ko kharcha k pasa bhejdena</span>
+                <div class="meta-info">
+                    <span class="time" contenteditable="true" spellcheck="false">4:31 pm</span>
+                    <span class="ticks">✓✓</span>
+                </div>
+            </div>
+
+            <div class="message received">
+                <button class="delete-btn" onclick="this.parentElement.remove()" title="Delete message">×</button>
+                <span class="message-content" contenteditable="true" spellcheck="false">Okay</span>
+                <div class="meta-info">
+                    <span class="time" contenteditable="true" spellcheck="false">4:32 pm</span>
+                </div>
+            </div>
+
+            <div class="message sent">
+                <button class="delete-btn" onclick="this.parentElement.remove()" title="Delete message">×</button>
+                <span class="message-content" contenteditable="true" spellcheck="false">Atif pasa bhejda</span>
+                <div class="meta-info">
+                    <span class="time" contenteditable="true" spellcheck="false">7:24 pm</span>
+                    <span class="ticks">✓✓</span>
+                </div>
+            </div>
+
+            <div class="message sent">
+                <button class="delete-btn" onclick="this.parentElement.remove()" title="Delete message">×</button>
+                <span class="message-content" contenteditable="true" spellcheck="false">Sham hogai ha</span>
+                <div class="meta-info">
+                    <span class="time" contenteditable="true" spellcheck="false">7:24 pm</span>
+                    <span class="ticks">✓✓</span>
+                </div>
+            </div>
+
+            <div class="message received">
+                <button class="delete-btn" onclick="this.parentElement.remove()" title="Delete message">×</button>
+                <span class="message-content" contenteditable="true" spellcheck="false">Bhj dia</span>
+                <div class="meta-info">
+                    <span class="time" contenteditable="true" spellcheck="false">9:45 pm</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="chat-input-area">
+            <div class="input-box-wrapper">
+                <button class="icon-btn" title="Emoji" onclick="toggleEmojiPicker(event)">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                </button>
+
+                <input type="text" id="messageInput" placeholder="Message" onkeypress="handleKeyPress(event)">
+                
+                <button class="icon-btn" title="Attach" onclick="document.getElementById('fileInput').click()">
+                    <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                </button>
+                <input type="file" id="fileInput" style="display: none;" onchange="handleAttachment(event)">
+
+                <button class="icon-btn" title="Camera" onclick="document.getElementById('cameraInput').click()">
+                    <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </button>
+                <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleAttachment(event)">
+
+                <div class="emoji-picker" id="emojiPicker">
+                    <span onclick="addEmoji('😊')">😊</span>
+                    <span onclick="addEmoji('😂')">😂</span>
+                    <span onclick="addEmoji('❤️')">❤️</span>
+                    <span onclick="addEmoji('👍')">👍</span>
+                    <span onclick="addEmoji('🔥')">🔥</span>
+                    <span onclick="addEmoji('😍')">😍</span>
+                    <span onclick="addEmoji('😎')">😎</span>
+                    <span onclick="addEmoji('😢')">😢</span>
+                    <span onclick="addEmoji('🙏')">🙏</span>
+                    <span onclick="addEmoji('✨')">✨</span>
+                </div>
+            </div>
+
+            <button class="send-mic-btn" id="sendMicBtn" onclick="handleSendOrMic()" title="Voice message">
+                <svg id="micSendSvg" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function changeDP(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const dpImage = document.getElementById('dpImage');
+                    const dpText = document.getElementById('dpText');
+                    dpImage.src = e.target.result;
+                    dpImage.style.display = 'block';
+                    dpText.style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        const messageInput = document.getElementById('messageInput');
+        const sendMicBtn = document.getElementById('sendMicBtn');
+        const micSendSvg = document.getElementById('micSendSvg');
+
+        messageInput.addEventListener('input', function() {
+            if (messageInput.value.trim().length > 0) {
+                micSendSvg.innerHTML = '<line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>';
+                sendMicBtn.title = 'Send message';
+            } else {
+                micSendSvg.innerHTML = '<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>';
+                sendMicBtn.title = 'Voice message';
+            }
+        });
+
+        function toggleEmojiPicker(event) {
+            event.stopPropagation();
+            const picker = document.getElementById('emojiPicker');
+            picker.style.display = picker.style.display === 'grid' ? 'none' : 'grid';
+        }
+
+        function addEmoji(emoji) {
+            messageInput.value += emoji;
+            messageInput.focus();
+            micSendSvg.innerHTML = '<line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>';
+            sendMicBtn.title = 'Send message';
+            document.getElementById('emojiPicker').style.display = 'none';
+        }
+
+        window.addEventListener('click', function() {
+            document.getElementById('emojiPicker').style.display = 'none';
+        });
+
+        // Load purane saved messages jab index.html open ho (Yahan msg.type use hoga taake refresh par color change na ho)
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedMessages = JSON.parse(localStorage.getItem('whatsapp_messages')) || [];
+            savedMessages.forEach(msg => {
+                appendMediaMessage(msg.content, msg.type, msg.time);
+            });
+        });
+
+        // Sunta hai ke doosri file se koi naya message aya ya nahi
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'whatsapp_messages') {
+                const messages = JSON.parse(event.newValue);
+                if (messages && messages.length > 0) {
+                    const latestMsg = messages[messages.length - 1];
+                    // Agar message doosri file se aya hai to check karein ke wo type kia hai
+                    // Agar wo 'sent' save hua hai doosri file mein, to is file ke liye wo 'received' ban kar save aur render hoga
+                    if (latestMsg.type === 'sent') {
+                        latestMsg.type = 'received';
+                    }
+                    appendMediaMessage(latestMsg.content, latestMsg.type, latestMsg.time);
+                }
+            }
+        });
+
+        function handleAttachment(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const mediaHtml = `<img src="${e.target.result}" style="max-width: 100%; border-radius: 6px; display: block; margin-bottom: 4px;" alt="Attachment"/>`;
+                    saveAndBroadcastIndexMessage(mediaHtml);
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveAndBroadcastIndexMessage(contentHtml) {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'pm' : 'am';
+            hours = hours % 12 || 12;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            const timeString = `${hours}:${minutes} ${ampm}`;
+
+            const messageObj = {
+                content: contentHtml,
+                time: timeString,
+                type: 'sent'
+            };
+
+            let messages = JSON.parse(localStorage.getItem('whatsapp_messages')) || [];
+            messages.push(messageObj);
+            localStorage.setItem('whatsapp_messages', JSON.stringify(messages));
+
+            appendMediaMessage(contentHtml, 'sent', timeString);
+        }
+
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (messageText === "") return;
+            const safeText = messageText.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            saveAndBroadcastIndexMessage(`<span class="message-content" contenteditable="true" spellcheck="false">${safeText}</span>`);
+            messageInput.value = "";
+            micSendSvg.innerHTML = '<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>';
+            sendMicBtn.title = 'Voice message';
+        }
+
+        function appendMediaMessage(innerHtmlContent, messageType = 'sent', timeString = null) {
+            const chatMessages = document.getElementById('chatMessages');
+
+            if (!timeString) {
+                const now = new Date();
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+                const ampm = hours >= 12 ? 'pm' : 'am';
+                hours = hours % 12 || 12;
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                timeString = `${hours}:${minutes} ${ampm}`;
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', messageType);
+
+            if (messageType === 'sent') {
+                messageDiv.innerHTML = `
+                    <button class="delete-btn" onclick="this.parentElement.remove()" title="Delete message">×</button>
+                    ${innerHtmlContent}
+                    <div class="meta-info">
+                        <span class="time" contenteditable="true" spellcheck="false">${timeString}</span>
+                        <span class="ticks">✓✓</span>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <button class="delete-btn" onclick="this.parentElement.remove()" title="Delete message">×</button>
+                    ${innerHtmlContent}
+                    <div class="meta-info">
+                        <span class="time" contenteditable="true" spellcheck="false">${timeString}</span>
+                    </div>
+                `;
+            }
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function handleSendOrMic() {
+            if (messageInput.value.trim().length > 0) {
+                sendMessage();
+            } else {
+                alert("Voice recording simulation: Mic button clicked!");
+            }
+        }
+    </script>
+</body>
+</html>

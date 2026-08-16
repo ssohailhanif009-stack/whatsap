@@ -12,21 +12,21 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-       body {
+        body {
             background-color: #dadbd4;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 100dvh; /* Mobile browsers ke liye dynamic height */
             width: 100vw;
             overflow: hidden;
-            margin: 0; /* Ye ensure karega ke koi extra space na ho */
+            margin: 0;
         }
 
         .chat-container {
             width: 100%;
             max-width: 400px;
-            height: 100vh; /* Ye mobile ki screen ko upar se neeche tak cover karega */
+            height: 100dvh; /* Pure screen par fit karne ke liye */
             background-color: #efeae2;
             border-radius: 0px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -36,18 +36,13 @@
             position: relative;
         }
 
-        /* Desktop ke liye fix height */
-        @media (min-width: 401px) {
-            .chat-container {
-                border-radius: 10px;
-                height: 650px; /* Desktop par ye 650px rahegi */
-            }
-        }
-
         @media (min-width: 401px) {
             .chat-container {
                 border-radius: 10px;
                 height: 650px;
+            }
+            body {
+                height: 100vh;
             }
         }
 
@@ -60,6 +55,7 @@
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid #f0f2f5;
+            flex-shrink: 0; /* Header ko compress hone se bachane ke liye */
         }
 
         .header-left {
@@ -110,7 +106,7 @@
             cursor: text;
         }
 
-        .profile-info h3:focus {
+        .profile- info h3:focus {
             background-color: rgba(0, 0, 0, 0.05);
             padding: 2px 4px;
             border-radius: 4px;
@@ -296,6 +292,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-shrink: 0; /* Input box ko chhota ya gayab hone se bachane ke liye */
         }
 
         .input-box-wrapper {
@@ -348,6 +345,7 @@
             color: white;
             border: none;
             width: 44px;
+            key: value;
             height: 44px;
             border-radius: 50%;
             cursor: pointer;

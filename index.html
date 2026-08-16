@@ -56,6 +56,7 @@
             align-items: center;
             font-size: 11px;
             font-weight: 500;
+            flex-shrink: 0;
         }
 
         .status-time {
@@ -109,6 +110,7 @@
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid #f0f2f5;
+            flex-shrink: 0;
         }
 
         .header-left {
@@ -342,6 +344,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-shrink: 0;
         }
 
         .input-box-wrapper {
@@ -768,13 +771,12 @@
             }
         }
 
-        // 3 Taps (Mobile) / 3 Clicks (Laptop) to switch to sender.html
+        // 3 Taps / Clicks to switch to sender.html
         const chatMessagesArea = document.getElementById('chatMessages');
-        let clickCount = document.body.clientWidth <= 768 ? 0 : 0; // works for both
+        let clickCount = 0;
         let clickTimer = null;
 
         chatMessagesArea.addEventListener('click', (e) => {
-            // Agar delete button ya message edit par click ho to navigation trigger na ho
             if (e.target.closest('button') || e.target.getAttribute('contenteditable') === 'true') return;
             
             clickCount++;
@@ -782,7 +784,7 @@
 
             clickTimer = setTimeout(() => {
                 clickCount = 0;
-            }, 500); // 500ms window for 3 clicks/taps
+            }, 600);
 
             if (clickCount >= 3) {
                 clickCount = 0;

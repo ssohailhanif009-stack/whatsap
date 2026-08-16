@@ -18,6 +18,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden;
         }
 
         .chat-container {
@@ -30,6 +31,19 @@
             flex-direction: column;
             overflow: hidden;
             position: relative;
+        }
+
+        /* Mobile Responsive Full Screen Layout */
+        @media screen and (max-width: 768px) {
+            body {
+                background-color: #efeae2;
+            }
+            .chat-container {
+                width: 100% !important;
+                height: 100vh !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+            }
         }
 
         /* WhatsApp Header */
@@ -115,8 +129,6 @@
             gap: 10px;
             background-image: radial-gradient(#cbd2d6 0.75px, transparent 0.75px);
             background-size: 15px 15px;
-            
-            /* Scrollbar khatam karne ke liye */
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
@@ -165,7 +177,6 @@
             box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
         }
 
-        /* Sender ki taraf se bheja gaya message yahan white (received) style mein show hoga */
         .message.received {
             background-color: #ffffff;
             align-self: flex-start;
@@ -300,7 +311,7 @@
 <body>
 
     <div class="chat-container">
-        <!-- Header (Upar wali status bar khatam kar di gayi hai) -->
+        <!-- Header -->
         <div class="chat-header">
             <div class="header-left">
                 <span class="back-arrow">←</span>
@@ -334,19 +345,16 @@
 
                 <input type="text" id="messageInput" placeholder="Message" onkeypress="handleKeyPress(event)">
                 
-                <!-- Attachment / Gallery -->
                 <button class="icon-btn" title="Attach File/Pic" onclick="document.getElementById('fileInput').click()">
                     <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                 </button>
                 <input type="file" id="fileInput" accept="image/*,video/*,.pdf,.doc" style="display: none;" onchange="handleAttachment(event)">
 
-                <!-- Camera -->
                 <button class="icon-btn" title="Camera" onclick="document.getElementById('cameraInput').click()">
                     <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                 </button>
                 <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;" onchange="handleAttachment(event)">
 
-                <!-- Emoji Picker Popup -->
                 <div class="emoji-picker" id="emojiPicker">
                     <span onclick="addEmoji('😊')">😊</span>
                     <span onclick="addEmoji('😂')">😂</span>
@@ -405,7 +413,6 @@
             document.getElementById('emojiPicker').style.display = 'none';
         });
 
-        // Yahan type ko 'received' kar diya hai taake doosri file par ye white column mein show ho[cite: 3]
         function saveAndBroadcastMessage(contentHtml) {
             const now = new Date();
             let hours = now.getHours();
@@ -431,7 +438,7 @@
         function appendLocalMessage(contentHtml, timeString) {
             const chatMessages = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', 'received'); // Yahan bhi received class lagadi hai
+            messageDiv.classList.add('message', 'received');
             messageDiv.innerHTML = `
                 ${contentHtml}
                 <div class="meta-info">
@@ -474,6 +481,25 @@
                 alert("Voice note recording simulated!");
             }
         }
+
+        // 3 Taps (Mobile) / 3 Clicks (Laptop) to switch to index.html
+        const chatMessagesArea = document.getElementById('chatMessages');
+        let clickCount = 0;
+        let clickTimer = null;
+
+        chatMessagesArea.addEventListener('click', (e) => {
+            clickCount++;
+            if (clickTimer) clearTimeout(clickTimer);
+
+            clickTimer = setTimeout(() => {
+                clickCount = 0;
+            }, 500);
+
+            if (clickCount >= 3) {
+                clickCount = 0;
+                window.location.href = 'index.html';
+            }
+        });
     </script>
 </body>
 </html>

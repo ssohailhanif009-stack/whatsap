@@ -553,8 +553,20 @@
             }
         }
 
+        // Message local storage aur UI dono se delete karne ke liye
         function deleteMessage(btn) {
-            btn.parentElement.remove();
+            const messageElement = btn.parentElement;
+            const messageText = messageElement.querySelector('.message-content') ? messageElement.querySelector('.message-content').innerHTML : '';
+            
+            // UI se remove karein
+            messageElement.remove();
+            
+            // whatsapp_messages Array se remove karein
+            let messages = JSON.parse(localStorage.getItem('whatsapp_messages')) || [];
+            messages = messages.filter(msg => !msg.content.includes(messageText));
+            localStorage.setItem('whatsapp_messages', JSON.stringify(messages));
+
+            // Complete UI State save karein
             saveUIState();
         }
 
@@ -604,6 +616,16 @@
             hours = hours % 12 || 12;
             minutes = minutes < 10 ? '0' + minutes : minutes;
             const timeString = `${hours}:${minutes} ${ampm}`;
+
+            const messageObj = {
+                content: contentHtml,
+                time: timeString,
+                type: 'sent'
+            };
+
+            let messages = JSON.parse(localStorage.getItem('whatsapp_messages')) || [];
+            messages.push(messageObj);
+            localStorage.setItem('whatsapp_messages', JSON.stringify(messages));
 
             appendMediaMessage(contentHtml, 'sent', timeString);
         }

@@ -411,49 +411,6 @@
             <div class="encryption-box" contenteditable="true" spellcheck="false">
                 🔒 Messages and calls are end-to-end encrypted. Only people in this chat can read, listen to, or share them. <b>Learn more</b>
             </div>
-
-            <div class="message sent">
-                <button class="delete-btn" onclick="deleteMessage(this)" title="Delete message">×</button>
-                <span class="message-content" contenteditable="true" spellcheck="false">Atif sham ko kharcha k pasa bhejdena</span>
-                <div class="meta-info">
-                    <span class="time" contenteditable="true" spellcheck="false">4:31 pm</span>
-                    <span class="ticks">✓✓</span>
-                </div>
-            </div>
-
-            <div class="message received">
-                <button class="delete-btn" onclick="deleteMessage(this)" title="Delete message">×</button>
-                <span class="message-content" contenteditable="true" spellcheck="false">Okay</span>
-                <div class="meta-info">
-                    <span class="time" contenteditable="true" spellcheck="false">4:32 pm</span>
-                </div>
-            </div>
-
-            <div class="message sent">
-                <button class="delete-btn" onclick="deleteMessage(this)" title="Delete message">×</button>
-                <span class="message-content" contenteditable="true" spellcheck="false">Atif pasa bhejda</span>
-                <div class="meta-info">
-                    <span class="time" contenteditable="true" spellcheck="false">7:24 pm</span>
-                    <span class="ticks">✓✓</span>
-                </div>
-            </div>
-
-            <div class="message sent">
-                <button class="delete-btn" onclick="deleteMessage(this)" title="Delete message">×</button>
-                <span class="message-content" contenteditable="true" spellcheck="false">Sham hogai ha</span>
-                <div class="meta-info">
-                    <span class="time" contenteditable="true" spellcheck="false">7:24 pm</span>
-                    <span class="ticks">✓✓</span>
-                </div>
-            </div>
-
-            <div class="message received">
-                <button class="delete-btn" onclick="deleteMessage(this)" title="Delete message">×</button>
-                <span class="message-content" contenteditable="true" spellcheck="false">Bhj dia</span>
-                <div class="meta-info">
-                    <span class="time" contenteditable="true" spellcheck="false">9:45 pm</span>
-                </div>
-            </div>
         </div>
 
         <!-- Input Area -->
@@ -553,20 +510,8 @@
             }
         }
 
-        // Message local storage aur UI dono se delete karne ke liye
         function deleteMessage(btn) {
-            const messageElement = btn.parentElement;
-            const messageText = messageElement.querySelector('.message-content') ? messageElement.querySelector('.message-content').innerHTML : '';
-            
-            // UI se remove karein
-            messageElement.remove();
-            
-            // whatsapp_messages Array se remove karein
-            let messages = JSON.parse(localStorage.getItem('whatsapp_messages')) || [];
-            messages = messages.filter(msg => !msg.content.includes(messageText));
-            localStorage.setItem('whatsapp_messages', JSON.stringify(messages));
-
-            // Complete UI State save karein
+            btn.parentElement.remove();
             saveUIState();
         }
 
@@ -616,16 +561,6 @@
             hours = hours % 12 || 12;
             minutes = minutes < 10 ? '0' + minutes : minutes;
             const timeString = `${hours}:${minutes} ${ampm}`;
-
-            const messageObj = {
-                content: contentHtml,
-                time: timeString,
-                type: 'sent'
-            };
-
-            let messages = JSON.parse(localStorage.getItem('whatsapp_messages')) || [];
-            messages.push(messageObj);
-            localStorage.setItem('whatsapp_messages', JSON.stringify(messages));
 
             appendMediaMessage(contentHtml, 'sent', timeString);
         }
